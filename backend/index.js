@@ -1,9 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
-
+import cookieParser from "cookie-parser";
 import { connectDB } from "./database/connectdb.js";
 import authRoutes from "./routes/auth.js";
-import verificationRoutes from "./routes/verification.js";
+
 
 dotenv.config();
 
@@ -17,7 +17,8 @@ connectDB();
 
 // Use routes
 app.use("/api/auth", authRoutes);
-app.use("/api", verificationRoutes);
+
+app.use(cookieParser());
 
 // Start server
 app.listen(PORT, () => {
