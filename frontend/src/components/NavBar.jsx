@@ -81,7 +81,7 @@ const Navbar = () => {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="py-2 px-3 bg-green-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-white transition duration-200 cursor-pointer"
+                                    className="py-2 px-3 text-green-600 font-medium hover:underline underline-offset-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-white transition duration-200 cursor-pointer"
                                 >
                                     Login
                                 </motion.button>
@@ -90,7 +90,7 @@ const Navbar = () => {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="py-2 px-3 bg-green-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-white transition duration-200 cursor-pointer"
+                                    className="py-2 px-3 bg-green-600 font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-white transition duration-200 cursor-pointer"
                                 >
                                     Sign up
                                 </motion.button>
