@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FileX, Fullscreen, X, Trash } from "lucide-react"; // Lucide icons
+import { FileX, Fullscreen, X, Trash, ChevronLeft, Image } from "lucide-react"; // Lucide icons
 import LeftNavbar from "../components/LeftNavBar";
 import axios from "axios";
 import { useAuthStore } from "../store/authStore";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 // Cloudinary Config
 const CLOUDINARY_CLOUD_NAME = "dh53bxmsk"; // Replace with your Cloudinary cloud name
@@ -15,6 +17,8 @@ const EPrescriptionPage = () => {
     const [fileUrl, setFileUrl] = useState(null);
     const [fileName, setFileName] = useState("");
     const [selectedPrescription, setSelectedPrescription] = useState(null); // For modal
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [prescriptionToDelete, setPrescriptionToDelete] = useState(null);
     const { user } = useAuthStore();
 
     const API_URL =
@@ -86,11 +90,6 @@ const EPrescriptionPage = () => {
     const handleDeletePrescription = async (id) => {
         if (!id) return;
 
-        const confirmDelete = window.confirm(
-            "Are you sure you want to delete this prescription?"
-        );
-        if (!confirmDelete) return;
-
         try {
             await axios.delete(`${API_URL}/delete/${id}`, {
                 withCredentials: true,
@@ -149,13 +148,13 @@ const EPrescriptionPage = () => {
                                     onClick={() =>
                                         setSelectedPrescription(prescription)
                                     }
-                                    className="p-4 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-all flex flex-col items-center cursor-pointer"
+                                    className="p-4 rounded-lg border shadow-md hover:shadow-lg transition-all flex flex-col items-center cursor-pointer bg-emerald-700/5 ring-1 ring-gray-900/10"
                                 >
                                     {/* Prescription Image */}
                                     <img
                                         src={prescription.fileUrl}
                                         alt={prescription.fileName}
-                                        className="w-full h-48 object-cover rounded-md"
+                                        className="w-full h-48 object-cover rounded-md bg-white ring-1 ring-gray-900/10"
                                     />
 
                                     {/* Prescription Name */}
@@ -184,11 +183,11 @@ const EPrescriptionPage = () => {
                         exit={{ scale: 0.8 }}
                     >
                         {/* Prescription Image Section */}
-                        <div className="w-1/2 p-4 relative">
+                        <div className="w-1/2 p-4 relative flex items-center justify-center">
                             <img
                                 src={selectedPrescription.fileUrl}
                                 alt={selectedPrescription.fileName}
-                                className="w-full object-cover rounded-md"
+                                className="w-full max-h-[80vh] object-cover rounded-md drop-shadow-lg"
                             />
 
                             {/* Fullscreen View Button */}
@@ -196,18 +195,19 @@ const EPrescriptionPage = () => {
                                 href={selectedPrescription.fileUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="absolute flex items-center justify-center bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-40 text-white px-4 py-2 rounded-md text-sm transition-all hover:bg-opacity-60"
+                                className="absolute flex items-center justify-center bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-30 text-white px-4 py-2 rounded-md text-sm transition-all hover:bg-opacity-50"
                             >
                                 <Fullscreen className="h-5 w-5 mr-2" />
                                 View Fullscreen
                             </a>
                             <button
-                                onClick={() =>
-                                    handleDeletePrescription(
+                                onClick={() => {
+                                    setPrescriptionToDelete(
                                         selectedPrescription._id
-                                    )
-                                }
-                                className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all"
+                                    );
+                                    setShowDeleteConfirm(true);
+                                }}
+                                className="absolute bottom-4 left-0 flex items-center gap-2 text-red-500 hover:text-red-600 bg-red-100 hover:bg-red-200 px-4 py-2 rounded-lg transition-all"
                             >
                                 <Trash className="w-5 h-5" />
                             </button>
@@ -216,82 +216,129 @@ const EPrescriptionPage = () => {
                         {/* OCR Text */}
                         <div className="w-1/2 p-4 flex flex-col">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-semibold text-gray-700">
+                                <h3 className="text-xl font-semibold text-green-700">
                                     Prescription Details
                                 </h3>
                                 <button
                                     onClick={() =>
                                         setSelectedPrescription(null)
                                     }
-                                    className="text-gray-500 hover:text-gray-700"
+                                    className="text-gray-500 hover:text-red-500 hover:bg-red-100 p-2 rounded-lg"
                                 >
                                     <X className="w-6 h-6" />
                                 </button>
                             </div>
-
-                            <p className="text-gray-600 whitespace-pre-wrap">
-                                {selectedPrescription.ocrText ||
-                                    "No text extracted from this prescription."}
-                            </p>
+                            <div className="h-[80vh] overflow-scroll">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {selectedPrescription.ocrText ||
+                                        "No text extracted from this prescription."}
+                                </ReactMarkdown>
+                            </div>
                         </div>
                     </motion.div>
                 </motion.div>
             )}
 
-            {/* Upload Modal */}
-            {showUploadModal && (
+            {/* Delete Confirmation Modal */}
+            {showDeleteConfirm && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                     <div className="bg-white p-6 rounded-lg shadow-2xl w-96">
                         <h3 className="text-xl font-semibold mb-4 text-gray-700">
-                            Upload Prescription
+                            Confirm Deletion
                         </h3>
+                        <p className="text-gray-600">
+                            Are you sure you want to delete this prescription?
+                        </p>
+                        <div className="flex justify-end gap-3 mt-5">
+                            <button
+                                onClick={() => {
+                                    handleDeletePrescription(
+                                        prescriptionToDelete
+                                    );
+                                    setShowDeleteConfirm(false);
+                                }}
+                                className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg transition-all"
+                            >
+                                Delete
+                            </button>
+                            <button
+                                onClick={() => setShowDeleteConfirm(false)}
+                                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-lg transition-all"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Upload Modal */}
+            {showUploadModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <motion.div
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0.8 }}
+                        className="bg-white p-6 rounded-lg shadow-lg w-96 relative"
+                    >
+                        {/* Close Button */}
+                        <div className="flex items-center justify-start mb-4">
+                            <button
+                                onClick={() => setShowUploadModal(false)}
+                                className="text-gray-500 hover:text-red-500 hover:bg-red-100 p-2 rounded-lg mr-4"
+                            >
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
+                            <h3 className="text-xl font-semibold text-gray-700">
+                                Upload Prescription
+                            </h3>
+                        </div>
 
                         <button
                             onClick={handleUpload}
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg w-full"
+                            className="bg-gray-100 hover:border-yellow-500 border-2 hover:border-dashed text-yellow-500 font-semibold px-5 py-2 rounded-lg w-full transition-all flex items-center justify-center"
                         >
-                            Choose File
+                            <span className="mr-2 py-5">
+                                <Image />
+                            </span>{" "}
+                            Choose Image
                         </button>
 
                         {fileUrl && (
                             <div className="mt-4 text-center">
-                                <p className="text-gray-700">
-                                    File Uploaded Successfully!
-                                </p>
                                 <a
                                     href={fileUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    className="text-blue-500 underline"
                                 >
-                                    View File
+                                    <img
+                                        src={fileUrl}
+                                        alt="Uploaded image"
+                                        className="w-full object-cover rounded-md"
+                                    />
                                 </a>
                             </div>
                         )}
 
                         <input
                             type="text"
-                            placeholder="Enter File Name"
+                            placeholder="Enter Prescription Name"
                             value={fileName}
                             onChange={(e) => setFileName(e.target.value)}
-                            className="mt-3 w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring focus:ring-green-400"
+                            className="mt-3 w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:border-green-600"
                         />
 
                         {/* Modal Buttons */}
                         <div className="flex justify-end gap-3 mt-5">
                             <button
                                 onClick={handleSaveToDB}
-                                className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg transition-all"
+                                className="flex items-center justify-center bg-green-200 drop-shadow-lg hover:bg-green-300 hover:text-green-600 font-semibold text-green-500 px-5 py-2 rounded-lg transition-all"
                             >
-                                Save
-                            </button>
-                            <button
-                                onClick={() => setShowUploadModal(false)}
-                                className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg transition-all"
-                            >
-                                Cancel
+                                Upload
                             </button>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             )}
         </div>

@@ -4,7 +4,7 @@ import LeftNavbar from "../components/LeftNavBar";
 const SymptomAnalyzerPage = () => {
     return (
         <div className="h-screen w-full flex">
-            <div className="min-w-[250px]">
+            <div className="min-w-[300px]">
                 <LeftNavbar />
             </div>
             <div className="w-full h-full flex justify-center items-center">
