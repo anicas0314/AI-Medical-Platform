@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FileX, Fullscreen, X } from "lucide-react"; // Lucide icons
+import { FileX, Fullscreen, X, Trash } from "lucide-react"; // Lucide icons
 import LeftNavbar from "../components/LeftNavBar";
 import axios from "axios";
 import { useAuthStore } from "../store/authStore";
@@ -80,6 +80,30 @@ const EPrescriptionPage = () => {
             setPrescriptions(response.data.prescriptions);
         } catch (error) {
             console.error("Error saving file:", error);
+        }
+    };
+
+    const handleDeletePrescription = async (id) => {
+        if (!id) return;
+
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete this prescription?"
+        );
+        if (!confirmDelete) return;
+
+        try {
+            await axios.delete(`${API_URL}/delete/${id}`, {
+                withCredentials: true,
+            });
+
+            // Close modal and refresh prescriptions list
+            setSelectedPrescription(null);
+            const response = await axios.get(API_URL, {
+                withCredentials: true,
+            });
+            setPrescriptions(response.data.prescriptions);
+        } catch (error) {
+            console.error("Error deleting prescription:", error);
         }
     };
 
@@ -177,6 +201,16 @@ const EPrescriptionPage = () => {
                                 <Fullscreen className="h-5 w-5 mr-2" />
                                 View Fullscreen
                             </a>
+                            <button
+                                onClick={() =>
+                                    handleDeletePrescription(
+                                        selectedPrescription._id
+                                    )
+                                }
+                                className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all"
+                            >
+                                <Trash className="w-5 h-5" />
+                            </button>
                         </div>
 
                         {/* OCR Text */}

@@ -69,3 +69,38 @@ export const getPrescriptions = async (req, res) => {
             .json({ success: false, message: "Server error." });
     }
 };
+
+export const deletePrescription = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the prescription
+        const prescription = await Prescription.findById(id);
+        if (!prescription) {
+            return res.status(404).json({ error: "Prescription not found" });
+        }
+
+        // Ensure the logged-in user owns the prescription
+        if (prescription.userId.toString() !== req.userId) {
+            return res.status(403).json({ error: "Unauthorized action" });
+        }
+
+        // Delete from Cloudinary (Optional)
+        const filePublicId = prescription.fileUrl
+            .split("/")
+            .pop()
+            .split(".")[0];
+        await cloudinary.uploader.destroy(`swiftcareAI/${filePublicId}`);
+
+        // Delete from MongoDB
+        await Prescription.findByIdAndDelete(id);
+
+        res.status(200).json({
+            success: true,
+            message: "Prescription deleted successfully",
+        });
+    } catch (error) {
+        console.error("Error deleting prescription:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
