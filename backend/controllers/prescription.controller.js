@@ -61,7 +61,7 @@ export const getPrescriptions = async (req, res) => {
             });
         }
 
-        return res.status(200).json(prescriptions);
+        return res.status(200).json({ success: true, prescriptions });
     } catch (error) {
         console.error("Error fetching prescriptions:", error);
         return res

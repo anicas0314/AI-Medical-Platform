@@ -27,7 +27,7 @@ const EPrescriptionPage = () => {
                 const response = await axios.get(API_URL, {
                     withCredentials: true,
                 });
-                setPrescriptions(response.data.prescriptions);
+                setPrescriptions(response.data.prescriptions || []);
             } catch (error) {
                 console.error("Error fetching prescriptions:", error);
             }
@@ -83,9 +83,9 @@ const EPrescriptionPage = () => {
     };
 
     return (
-        <div className="h-screen w-full flex bg-gray-100">
+        <div className="h-screen w-full flex bg-gray-100 z-0">
             {/* Sidebar */}
-            <div className="min-w-[250px] bg-white shadow-md">
+            <div className="min-w-[300px] bg-white shadow-md">
                 <LeftNavbar />
             </div>
 
@@ -109,8 +109,7 @@ const EPrescriptionPage = () => {
 
                 {/* Prescription List */}
                 <div className="mt-6">
-                    {/* {prescriptions.length === 0 ? ( */}
-                    {true ? (
+                    {prescriptions.length === 0 ? (
                         <div className="flex flex-col items-center justify-center text-gray-500">
                             <FileX className="w-16 h-16 mb-3" />
                             <p className="text-lg">
@@ -122,18 +121,28 @@ const EPrescriptionPage = () => {
                             {prescriptions.map((prescription) => (
                                 <div
                                     key={prescription._id}
-                                    className="p-4 bg-gray-50 rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-all"
+                                    className="p-4 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-all flex flex-col items-center"
                                 >
-                                    <h4 className="font-semibold text-gray-700 truncate">
+                                    {/* Prescription Image */}
+                                    <img
+                                        src={prescription.fileUrl}
+                                        alt={prescription.fileName}
+                                        className="w-full h-48 object-cover rounded-md"
+                                    />
+
+                                    {/* Prescription Name */}
+                                    <h4 className="font-semibold text-gray-700 mt-3 truncate w-full text-center">
                                         {prescription.fileName}
                                     </h4>
+
+                                    {/* View Prescription Button */}
                                     <a
                                         href={prescription.fileUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-blue-500 underline mt-2 block"
+                                        className="text-blue-500 underline mt-2"
                                     >
-                                        View Prescription
+                                        View Full Prescription
                                     </a>
                                 </div>
                             ))}

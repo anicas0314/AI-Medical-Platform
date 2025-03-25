@@ -22,10 +22,10 @@ const LeftNavbar = () => {
     return (
         <>
             {/* Navbar */}
-            <div className="h-screen bg-white shadow-lg relative z-40">
+            <div className="h-screen w-full bg-white shadow-lg relative z-40">
                 {/* Logo Section */}
                 <Link to="/">
-                    <div className="flex items-center w-fit px-8 py-8 mb-4 bg-gradient-to-r from-emerald-900 to-green-600">
+                    <div className="w-full flex items-center justify-center px-8 py-8 mb-4 bg-gradient-to-r from-emerald-900 to-green-600">
                         <img
                             className="w-10 h-10 object-cover drop-shadow-lg"
                             alt="Logo"
