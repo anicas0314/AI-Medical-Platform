@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FileX } from "lucide-react";
+import { FileX, Fullscreen, X } from "lucide-react"; // Lucide icons
 import LeftNavbar from "../components/LeftNavBar";
 import axios from "axios";
 import { useAuthStore } from "../store/authStore";
@@ -14,6 +14,7 @@ const EPrescriptionPage = () => {
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [fileUrl, setFileUrl] = useState(null);
     const [fileName, setFileName] = useState("");
+    const [selectedPrescription, setSelectedPrescription] = useState(null); // For modal
     const { user } = useAuthStore();
 
     const API_URL =
@@ -121,7 +122,10 @@ const EPrescriptionPage = () => {
                             {prescriptions.map((prescription) => (
                                 <div
                                     key={prescription._id}
-                                    className="p-4 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-all flex flex-col items-center"
+                                    onClick={() =>
+                                        setSelectedPrescription(prescription)
+                                    }
+                                    className="p-4 bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-all flex flex-col items-center cursor-pointer"
                                 >
                                     {/* Prescription Image */}
                                     <img
@@ -134,22 +138,71 @@ const EPrescriptionPage = () => {
                                     <h4 className="font-semibold text-gray-700 mt-3 truncate w-full text-center">
                                         {prescription.fileName}
                                     </h4>
-
-                                    {/* View Prescription Button */}
-                                    <a
-                                        href={prescription.fileUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-500 underline mt-2"
-                                    >
-                                        View Full Prescription
-                                    </a>
                                 </div>
                             ))}
                         </div>
                     )}
                 </div>
             </div>
+
+            {/* Prescription Modal */}
+            {selectedPrescription && (
+                <motion.div
+                    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                >
+                    <motion.div
+                        className="bg-white p-6 rounded-lg shadow-2xl w-[90vw] max-w-6xl flex"
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0.8 }}
+                    >
+                        {/* Prescription Image Section */}
+                        <div className="w-1/2 p-4 relative">
+                            <img
+                                src={selectedPrescription.fileUrl}
+                                alt={selectedPrescription.fileName}
+                                className="w-full object-cover rounded-md"
+                            />
+
+                            {/* Fullscreen View Button */}
+                            <a
+                                href={selectedPrescription.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="absolute flex items-center justify-center bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-40 text-white px-4 py-2 rounded-md text-sm transition-all hover:bg-opacity-60"
+                            >
+                                <Fullscreen className="h-5 w-5 mr-2" />
+                                View Fullscreen
+                            </a>
+                        </div>
+
+                        {/* OCR Text */}
+                        <div className="w-1/2 p-4 flex flex-col">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-semibold text-gray-700">
+                                    Prescription Details
+                                </h3>
+                                <button
+                                    onClick={() =>
+                                        setSelectedPrescription(null)
+                                    }
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <p className="text-gray-600 whitespace-pre-wrap">
+                                {selectedPrescription.ocrText ||
+                                    "No text extracted from this prescription."}
+                            </p>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
 
             {/* Upload Modal */}
             {showUploadModal && (
@@ -194,7 +247,6 @@ const EPrescriptionPage = () => {
                             <button
                                 onClick={handleSaveToDB}
                                 className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg transition-all"
-                                disabled={!fileUrl}
                             >
                                 Save
                             </button>
