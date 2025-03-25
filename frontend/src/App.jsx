@@ -14,6 +14,12 @@ import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authStore";
 import { useEffect } from "react";
 import HomePage from "./pages/HomePage";
+import SymptomAnalyzerPage from "./pages/SymptomAnalyzerPage";
+import SmartTestGuidePage from "./pages/SmartTestGuidePage";
+import HealthVaultPage from "./pages/HealthVaultPage";
+import EPrescriptionPage from "./pages/EPrescriptionPage";
+import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 
 // protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -128,6 +134,54 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <DashboardPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/symptom-analyzer"
+                    element={
+                        <ProtectedRoute>
+                            <SymptomAnalyzerPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/smart-test-guide"
+                    element={
+                        <ProtectedRoute>
+                            <SmartTestGuidePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/healthvault"
+                    element={
+                        <ProtectedRoute>
+                            <HealthVaultPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/eprescription"
+                    element={
+                        <ProtectedRoute>
+                            <EPrescriptionPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <ProfilePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/settings"
+                    element={
+                        <ProtectedRoute>
+                            <SettingsPage />
                         </ProtectedRoute>
                     }
                 />
