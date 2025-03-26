@@ -10,6 +10,8 @@ import {
     Search,
 } from "lucide-react";
 import LeftNavbar from "../components/LeftNavBar";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const HealthVaultPage = () => {
     const [sections, setSections] = useState([]);
@@ -20,8 +22,56 @@ const HealthVaultPage = () => {
     const addSection = () => {
         setSections([
             ...sections,
-            { name: `New Section ${sections.length + 1}`, files: [] },
+            {
+                name: `New Section ${sections.length + 1}`,
+                files: [],
+                texts: [],
+            },
         ]);
+    };
+
+    const addTextEntry = (sectionIndex) => {
+        const updatedSections = [...sections];
+        updatedSections[sectionIndex].texts.push({
+            content: "New Entry", // Default value
+            isEditing: true,
+        });
+        setSections(updatedSections);
+    };
+
+    const updateTextEntry = (sectionIndex, textIndex, value) => {
+        const updatedSections = [...sections];
+        updatedSections[sectionIndex].texts[textIndex].content = value;
+        setSections(updatedSections);
+    };
+
+    const saveTextEntry = (sectionIndex, textIndex) => {
+        const updatedSections = [...sections];
+
+        // Check if the text is empty
+        if (
+            updatedSections[sectionIndex].texts[textIndex].content.trim() === ""
+        ) {
+            // Remove the empty text entry
+            updatedSections[sectionIndex].texts.splice(textIndex, 1);
+        } else {
+            // Otherwise, mark it as not editing
+            updatedSections[sectionIndex].texts[textIndex].isEditing = false;
+        }
+
+        setSections(updatedSections);
+    };
+
+    const editTextEntry = (sectionIndex, textIndex) => {
+        const updatedSections = [...sections];
+        updatedSections[sectionIndex].texts[textIndex].isEditing = true;
+        setSections(updatedSections);
+    };
+
+    const deleteTextEntry = (sectionIndex, textIndex) => {
+        const updatedSections = [...sections];
+        updatedSections[sectionIndex].texts.splice(textIndex, 1);
+        setSections(updatedSections);
     };
 
     const handleFileUpload = (e, sectionIndex) => {
@@ -92,7 +142,7 @@ const HealthVaultPage = () => {
 
                 <hr className="mb-10" />
 
-                <div className="space-y-6 max-h-[calc(100vh-160px)] h-full overflow-y-auto pr-4 mb-10">
+                <div className="space-y-6 max-h-[calc(100vh-160px)] h-full 2xl:mx-40 xl:mx-20 overflow-y-auto pr-4 mb-10">
                     {sections.length > 0 ? (
                         sections
                             .filter((section) =>
@@ -156,6 +206,15 @@ const HealthVaultPage = () => {
                                         </div>
                                         {/* Upload & Delete Buttons */}
                                         <div className="flex items-center gap-4">
+                                            <button
+                                                className="bg-yellow-500 text-white px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-yellow-600 transition text-sm"
+                                                onClick={() =>
+                                                    addTextEntry(sectionIndex)
+                                                }
+                                            >
+                                                <PlusCircle size={18} /> Add
+                                                Text
+                                            </button>
                                             <input
                                                 type="file"
                                                 multiple
@@ -241,9 +300,76 @@ const HealthVaultPage = () => {
                                                 )
                                             )
                                         ) : (
-                                            <p className="text-gray-500 text-sm">
-                                                No files uploaded.
-                                            </p>
+                                            <>
+                                                {section.files.length === 0 &&
+                                                    section.texts.length ===
+                                                        0 && (
+                                                        <p className="text-gray-500 text-sm">
+                                                            No files or text
+                                                            added yet.
+                                                        </p>
+                                                    )}
+                                            </>
+                                        )}
+                                        {/* Text Entries */}
+                                        {section.texts.map(
+                                            (text, textIndex) => (
+                                                <div
+                                                    key={textIndex}
+                                                    className="bg-gray-100 p-3 rounded-lg mb-2 relative"
+                                                >
+                                                    {text.isEditing ? (
+                                                        <textarea
+                                                            value={text.content}
+                                                            onChange={(e) =>
+                                                                updateTextEntry(
+                                                                    sectionIndex,
+                                                                    textIndex,
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            onBlur={() =>
+                                                                saveTextEntry(
+                                                                    sectionIndex,
+                                                                    textIndex
+                                                                )
+                                                            }
+                                                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-400 focus:outline-none"
+                                                            autoFocus
+                                                        />
+                                                    ) : (
+                                                        <div
+                                                            onClick={() =>
+                                                                editTextEntry(
+                                                                    sectionIndex,
+                                                                    textIndex
+                                                                )
+                                                            }
+                                                            className="cursor-pointer"
+                                                        >
+                                                            <ReactMarkdown
+                                                                remarkPlugins={[
+                                                                    remarkGfm,
+                                                                ]}
+                                                            >
+                                                                {text.content}
+                                                            </ReactMarkdown>
+                                                        </div>
+                                                    )}
+                                                    <button
+                                                        className="absolute top-2 right-4 text-red-500 hover:text-red-700 mt-2"
+                                                        onClick={() =>
+                                                            deleteTextEntry(
+                                                                sectionIndex,
+                                                                textIndex
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            )
                                         )}
                                     </div>
                                 </motion.div>
