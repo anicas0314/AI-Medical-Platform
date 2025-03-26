@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
     PlusCircle,
@@ -8,26 +8,62 @@ import {
     Download,
     Upload,
     Search,
+    ExternalLink,
 } from "lucide-react";
 import LeftNavbar from "../components/LeftNavBar";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import axios from "axios";
 
 const HealthVaultPage = () => {
     const [sections, setSections] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [editingIndex, setEditingIndex] = useState(null);
     const [newSectionName, setNewSectionName] = useState("");
+    const [editingFileIndex, setEditingFileIndex] = useState(null);
+    const [newFileName, setNewFileName] = useState("");
+
+    const API_URL =
+        import.meta.env.MODE === "development"
+            ? "http://localhost:3000/api/healthVault"
+            : "/api/healthVault";
+
+    // Fetch health vault data on component mount
+    useEffect(() => {
+        const fetchHealthVault = async () => {
+            try {
+                const response = await axios.get(API_URL, {
+                    withCredentials: true,
+                });
+                setSections(response.data.sections || []);
+            } catch (error) {
+                console.error("Error fetching health vault:", error);
+            }
+        };
+
+        fetchHealthVault();
+    }, []);
+
+    const saveSectionsToDB = async (updatedSections) => {
+        try {
+            await axios.post(
+                API_URL,
+                { sections: updatedSections },
+                { withCredentials: true }
+            );
+        } catch (error) {
+            console.error("Error saving sections to DB:", error);
+        }
+    };
 
     const addSection = () => {
-        setSections([
-            ...sections,
-            {
-                name: `New Section ${sections.length + 1}`,
-                files: [],
-                texts: [],
-            },
-        ]);
+        const newSection = {
+            name: `New Section ${sections.length + 1}`,
+            files: [],
+            texts: [],
+        };
+        setSections([...sections, newSection]);
+        saveSectionsToDB([...sections, newSection]); // Save to DB after adding
     };
 
     const addTextEntry = (sectionIndex) => {
@@ -37,12 +73,14 @@ const HealthVaultPage = () => {
             isEditing: true,
         });
         setSections(updatedSections);
+        saveSectionsToDB(updatedSections);
     };
 
     const updateTextEntry = (sectionIndex, textIndex, value) => {
         const updatedSections = [...sections];
         updatedSections[sectionIndex].texts[textIndex].content = value;
         setSections(updatedSections);
+        saveSectionsToDB(updatedSections);
     };
 
     const saveTextEntry = (sectionIndex, textIndex) => {
@@ -60,36 +98,77 @@ const HealthVaultPage = () => {
         }
 
         setSections(updatedSections);
+        saveSectionsToDB(updatedSections);
     };
 
     const editTextEntry = (sectionIndex, textIndex) => {
         const updatedSections = [...sections];
         updatedSections[sectionIndex].texts[textIndex].isEditing = true;
         setSections(updatedSections);
+        saveSectionsToDB(updatedSections);
     };
 
     const deleteTextEntry = (sectionIndex, textIndex) => {
         const updatedSections = [...sections];
         updatedSections[sectionIndex].texts.splice(textIndex, 1);
         setSections(updatedSections);
+        saveSectionsToDB(updatedSections);
     };
 
-    const handleFileUpload = (e, sectionIndex) => {
+    const handleFileUpload = async (e, sectionIndex) => {
         const uploadedFiles = Array.from(e.target.files);
         const updatedSections = [...sections];
-        updatedSections[sectionIndex].files.push(...uploadedFiles);
+
+        for (const file of uploadedFiles) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "jagvvfvr"); // Replace with your upload preset
+
+            try {
+                const response = await axios.post(
+                    `https://api.cloudinary.com/v1_1/dh53bxmsk/auto/upload`, // Replace with your Cloudinary cloud name
+                    formData,
+                    { withCredentials: false }
+                );
+                console.log(response.data.original_filename);
+                console.log(response.data.secure_url);
+                updatedSections[sectionIndex].files.push({
+                    fileName: response.data.original_filename,
+                    fileUrl: response.data.secure_url,
+                });
+            } catch (error) {
+                console.error("Error uploading file:", error);
+            }
+        }
+
         setSections(updatedSections);
+        saveSectionsToDB(updatedSections);
+    };
+
+    const startEditingFileName = (sectionIndex, fileIndex, currentFileName) => {
+        setEditingFileIndex({ sectionIndex, fileIndex });
+        setNewFileName(currentFileName);
+    };
+
+    const saveNewFileName = (sectionIndex, fileIndex) => {
+        const updatedSections = [...sections];
+        updatedSections[sectionIndex].files[fileIndex].fileName = newFileName;
+        setSections(updatedSections);
+        saveSectionsToDB(updatedSections);
+        setEditingFileIndex(null);
     };
 
     const deleteFile = (sectionIndex, fileIndex) => {
         const updatedSections = [...sections];
         updatedSections[sectionIndex].files.splice(fileIndex, 1);
         setSections(updatedSections);
+        saveSectionsToDB(updatedSections);
     };
 
     const deleteSection = (index) => {
         const updatedSections = sections.filter((_, i) => i !== index);
         setSections(updatedSections);
+        saveSectionsToDB(updatedSections);
     };
 
     const startEditing = (index, name) => {
@@ -102,6 +181,7 @@ const HealthVaultPage = () => {
         const updatedSections = [...sections];
         updatedSections[index].name = newSectionName;
         setSections(updatedSections);
+        saveSectionsToDB(updatedSections);
         setEditingIndex(null);
     };
 
@@ -207,7 +287,7 @@ const HealthVaultPage = () => {
                                         {/* Upload & Delete Buttons */}
                                         <div className="flex items-center gap-4">
                                             <button
-                                                className="bg-yellow-500 text-white px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-yellow-600 transition text-sm"
+                                                className="text-yellow-600 bg-yellow-50 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-yellow-200 transition text-sm"
                                                 onClick={() =>
                                                     addTextEntry(sectionIndex)
                                                 }
@@ -229,22 +309,25 @@ const HealthVaultPage = () => {
                                             />
                                             <label
                                                 htmlFor={`file-upload-${sectionIndex}`}
-                                                className="cursor-pointer bg-blue-500 text-white px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 transition text-sm"
+                                                className="cursor-pointer text-blue-600 bg-blue-50 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-200 transition text-sm"
                                             >
                                                 <Upload size={18} /> Upload
                                             </label>
 
                                             <button
                                                 className={`px-3 py-2 rounded-lg flex items-center gap-2 transition text-sm ${
-                                                    section.files.length === 0
-                                                        ? "bg-red-500 text-white hover:bg-red-600"
+                                                    section.files.length ===
+                                                        0 &&
+                                                    section.texts.length === 0
+                                                        ? "bg-red-200 text-red-600 hover:bg-red-400 hover:text-red-800"
                                                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                                 }`}
                                                 onClick={() =>
                                                     deleteSection(sectionIndex)
                                                 }
                                                 disabled={
-                                                    section.files.length > 0
+                                                    section.files.length > 0 ||
+                                                    section.texts.length > 0
                                                 }
                                             >
                                                 <Trash2 size={18} />
@@ -266,19 +349,73 @@ const HealthVaultPage = () => {
                                                                 size={18}
                                                                 className="text-blue-500"
                                                             />
-                                                            {file.name}
+                                                            {editingFileIndex?.fileIndex ===
+                                                                fileIndex &&
+                                                            editingFileIndex.sectionIndex ===
+                                                                sectionIndex ? (
+                                                                <input
+                                                                    type="text"
+                                                                    value={
+                                                                        newFileName
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        setNewFileName(
+                                                                            e
+                                                                                .target
+                                                                                .value
+                                                                        )
+                                                                    }
+                                                                    onBlur={() =>
+                                                                        saveNewFileName(
+                                                                            sectionIndex,
+                                                                            fileIndex
+                                                                        )
+                                                                    }
+                                                                    onKeyDown={(
+                                                                        e
+                                                                    ) => {
+                                                                        if (
+                                                                            e.key ===
+                                                                            "Enter"
+                                                                        ) {
+                                                                            saveNewFileName(
+                                                                                sectionIndex,
+                                                                                fileIndex
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                    className="border border-gray-300 px-2 py-1 rounded-md focus:ring-2 focus:ring-green-400 focus:outline-none"
+                                                                    autoFocus
+                                                                />
+                                                            ) : (
+                                                                <span
+                                                                    className="cursor-pointer"
+                                                                    onClick={() =>
+                                                                        startEditingFileName(
+                                                                            sectionIndex,
+                                                                            fileIndex,
+                                                                            file.fileName
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        file.fileName
+                                                                    }
+                                                                </span>
+                                                            )}
                                                         </span>
-                                                        <div className="flex gap-2">
+                                                        <div className="flex gap-6">
                                                             <a
-                                                                href={URL.createObjectURL(
-                                                                    file
-                                                                )}
-                                                                download={
-                                                                    file.name
+                                                                href={
+                                                                    file.fileUrl
                                                                 }
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
                                                                 className="text-green-500 hover:text-green-700"
                                                             >
-                                                                <Download
+                                                                <ExternalLink
                                                                     size={18}
                                                                 />
                                                             </a>

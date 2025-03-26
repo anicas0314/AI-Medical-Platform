@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import { connectDB } from "./database/connectdb.js";
 import authRoutes from "./routes/auth.route.js";
 import prescriptionRoutes from "./routes/prescription.route.js";
+import healthVaultRoutes from "./routes/healthVault.route.js";
 import cors from "cors";
 
 dotenv.config();
@@ -26,3 +27,4 @@ app.listen(port, () => {
 // Use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/prescriptions", prescriptionRoutes);
+app.use("/api/healthVault", healthVaultRoutes);
