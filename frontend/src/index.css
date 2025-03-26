@@ -40,8 +40,8 @@
 /* Custom Scrollbar theme */
 @layer utilities {
   ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
@@ -49,15 +49,16 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: var(--color-accent-5); /* Use the CSS variable */
+    background: linear-gradient(to bottom, #8ffcdf7c, #08ce856b);
     border-radius: 10px;
     border: none;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-primary); /* Use the CSS variable */
+    background: linear-gradient(to bottom, #56ecc4, #059669); 
   }
 }
+
 
 .no-select {
   user-select: none; /* Non-standard syntax */
