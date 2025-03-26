@@ -5,6 +5,7 @@ import { connectDB } from "./database/connectdb.js";
 import authRoutes from "./routes/auth.route.js";
 import prescriptionRoutes from "./routes/prescription.route.js";
 import healthVaultRoutes from "./routes/healthVault.route.js";
+import aiRoutes from "./routes/ai_agent.route.js";
 import cors from "cors";
 
 dotenv.config();
@@ -28,3 +29,4 @@ app.listen(port, () => {
 app.use("/api/auth", authRoutes);
 app.use("/api/prescriptions", prescriptionRoutes);
 app.use("/api/healthVault", healthVaultRoutes);
+app.use("/api/ai", aiRoutes);
