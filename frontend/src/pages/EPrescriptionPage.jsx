@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FileX, Fullscreen, X, Trash, ChevronLeft, Image } from "lucide-react"; // Lucide icons
+import {
+    FileX,
+    Fullscreen,
+    X,
+    Trash,
+    ChevronLeft,
+    Image,
+    Edit,
+    Save,
+} from "lucide-react"; // Lucide icons
 import LeftNavbar from "../components/LeftNavBar";
 import axios from "axios";
 import { useAuthStore } from "../store/authStore";
@@ -19,6 +28,8 @@ const EPrescriptionPage = () => {
     const [selectedPrescription, setSelectedPrescription] = useState(null); // For modal
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [prescriptionToDelete, setPrescriptionToDelete] = useState(null);
+    const [isEditing, setIsEditing] = useState(false); // Track edit mode
+    const [editedText, setEditedText] = useState(""); // Store edited text
     const { user } = useAuthStore();
 
     const API_URL =
@@ -40,6 +51,37 @@ const EPrescriptionPage = () => {
 
         fetchPrescriptions();
     }, []);
+
+    const handleSaveEdit = async () => {
+        if (!selectedPrescription || !editedText) return;
+
+        try {
+            await axios.patch(
+                `${API_URL}/update-ocr/${selectedPrescription._id}`,
+                { ocrText: editedText }, // Send updated text
+                { withCredentials: true }
+            );
+
+            // Update local state immediately
+            setPrescriptions((prevPrescriptions) =>
+                prevPrescriptions.map((p) =>
+                    p._id === selectedPrescription._id
+                        ? { ...p, ocrText: editedText } // Update the specific prescription
+                        : p
+                )
+            );
+
+            // Update selectedPrescription to reflect changes in the modal
+            setSelectedPrescription((prev) => ({
+                ...prev,
+                ocrText: editedText, // Update the ocrText in the selected prescription
+            }));
+
+            setIsEditing(false); // Exit edit mode
+        } catch (error) {
+            console.error("Error updating prescription text:", error);
+        }
+    };
 
     const handleUpload = () => {
         window.cloudinary.openUploadWidget(
@@ -213,27 +255,69 @@ const EPrescriptionPage = () => {
                             </button>
                         </div>
 
-                        {/* OCR Text */}
+                        {/* Right: Prescription Details */}
                         <div className="w-1/2 p-4 flex flex-col">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-semibold text-green-700">
-                                    Prescription Details
-                                </h3>
+                                <div className="flex items-center">
+                                    <h3 className="text-xl font-semibold text-green-700">
+                                        Prescription Details
+                                    </h3>
+                                    <button
+                                        onClick={() => {
+                                            setIsEditing(true);
+                                            setEditedText(
+                                                selectedPrescription.ocrText ||
+                                                    ""
+                                            ); // Populate with current text
+                                        }}
+                                        className="text-gray-500 hover:text-blue-500 hover:bg-blue-100 p-2 ml-4 rounded-lg"
+                                    >
+                                        <Edit className="w-6 h-6" />
+                                    </button>
+                                </div>
+
                                 <button
-                                    onClick={() =>
-                                        setSelectedPrescription(null)
-                                    }
+                                    onClick={() => {
+                                        setSelectedPrescription(null);
+                                        setIsEditing(false);
+                                    }}
                                     className="text-gray-500 hover:text-red-500 hover:bg-red-100 p-2 rounded-lg"
                                 >
                                     <X className="w-6 h-6" />
                                 </button>
                             </div>
                             <div className="h-[80vh] overflow-scroll">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {selectedPrescription.ocrText ||
-                                        "No text extracted from this prescription."}
-                                </ReactMarkdown>
+                                {isEditing ? (
+                                    <textarea
+                                        value={editedText}
+                                        onChange={(e) =>
+                                            setEditedText(e.target.value)
+                                        }
+                                        className="w-full h-full border border-gray-300 p-2 rounded-md focus:outline-none focus:border-green-600"
+                                    />
+                                ) : (
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                        {selectedPrescription.ocrText ||
+                                            "No text extracted from this prescription."}
+                                    </ReactMarkdown>
+                                )}
                             </div>
+                            {isEditing && (
+                                <div className="flex justify-end gap-3 mt-5">
+                                    <button
+                                        onClick={handleSaveEdit}
+                                        className="flex items-center justify-center bg-green-200 drop-shadow-lg hover:bg-green-300 hover:text-green-600 font-semibold text-green-500 px-5 py-2 rounded-lg transition-all"
+                                    >
+                                        Save
+                                    </button>
+                                    <button
+                                        onClick={() => setIsEditing(false)}
+                                        className="flex items-center justify-center bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded-lg transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </motion.div>
                 </motion.div>
