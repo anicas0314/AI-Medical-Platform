@@ -1,40 +1,274 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+import {
+    PlusCircle,
+    Folder,
+    FileText,
+    Trash2,
+    Download,
+    Upload,
+    Search,
+} from "lucide-react";
 import LeftNavbar from "../components/LeftNavBar";
 
 const HealthVaultPage = () => {
+    const [sections, setSections] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [editingIndex, setEditingIndex] = useState(null);
+    const [newSectionName, setNewSectionName] = useState("");
+
+    const addSection = () => {
+        setSections([
+            ...sections,
+            { name: `New Section ${sections.length + 1}`, files: [] },
+        ]);
+    };
+
+    const handleFileUpload = (e, sectionIndex) => {
+        const uploadedFiles = Array.from(e.target.files);
+        const updatedSections = [...sections];
+        updatedSections[sectionIndex].files.push(...uploadedFiles);
+        setSections(updatedSections);
+    };
+
+    const deleteFile = (sectionIndex, fileIndex) => {
+        const updatedSections = [...sections];
+        updatedSections[sectionIndex].files.splice(fileIndex, 1);
+        setSections(updatedSections);
+    };
+
+    const deleteSection = (index) => {
+        const updatedSections = sections.filter((_, i) => i !== index);
+        setSections(updatedSections);
+    };
+
+    const startEditing = (index, name) => {
+        setEditingIndex(index);
+        setNewSectionName(name);
+    };
+
+    const saveNewSectionName = (index) => {
+        if (newSectionName.trim() === "") return;
+        const updatedSections = [...sections];
+        updatedSections[index].name = newSectionName;
+        setSections(updatedSections);
+        setEditingIndex(null);
+    };
+
     return (
-        <div className="h-screen w-full flex">
-            <div className="min-w-[300px]">
+        <div className="h-screen w-full flex bg-gray-100">
+            <div className="min-w-[300px] bg-white shadow-md">
                 <LeftNavbar />
             </div>
-            <div className="w-full h-full flex justify-center items-center">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.5 }}
-                    className="max-w-md w-full h-fit mx-auto mt-10 p-8 bg-white bg-opacity-90 rounded-xl shadow-2xl border border-gray-300"
-                >
-                    <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-600 text-transparent bg-clip-text">
+
+            <div className="w-full p-8 z-0">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-600 text-transparent bg-clip-text">
                         Health Vault
                     </h2>
 
-                    <div className="space-y-6">
-                        <motion.div
-                            className="p-4 bg-gray-100 bg-opacity-80 rounded-lg border border-gray-300"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
+                    <div className="flex items-center gap-4">
+                        <div className="relative flex items-center justify-center">
+                            <Search
+                                className="text-gray-400 -mr-7 z-10"
+                                size={18}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Search sections..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none"
+                            />
+                        </div>
+                        <button
+                            className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-600 transition"
+                            onClick={addSection}
                         >
-                            <h3 className="text-xl font-semibold text-green-500 mb-3">
-                                To be implemented
-                            </h3>
-                            <p className="text-gray-800">
-                                This page has not been implemented yet.
-                            </p>
-                        </motion.div>
+                            <PlusCircle size={20} /> Add Section
+                        </button>
                     </div>
-                </motion.div>
+                </div>
+
+                <hr className="mb-10" />
+
+                <div className="space-y-6 max-h-[calc(100vh-160px)] h-full overflow-y-auto pr-4 mb-10">
+                    {sections.length > 0 ? (
+                        sections
+                            .filter((section) =>
+                                section.name
+                                    .toLowerCase()
+                                    .includes(searchTerm.toLowerCase())
+                            )
+                            .map((section, sectionIndex) => (
+                                <motion.div
+                                    key={sectionIndex}
+                                    className="bg-white p-4 rounded-lg shadow-lg border border-gray-300"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                >
+                                    {/* Section Header */}
+                                    <div className="flex justify-between items-center mb-4">
+                                        <div className="flex items-center gap-2">
+                                            <Folder
+                                                size={20}
+                                                className="text-green-600"
+                                            />
+
+                                            {/* Editable Section Name */}
+                                            {editingIndex === sectionIndex ? (
+                                                <input
+                                                    type="text"
+                                                    value={newSectionName}
+                                                    onChange={(e) =>
+                                                        setNewSectionName(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    onBlur={() =>
+                                                        saveNewSectionName(
+                                                            sectionIndex
+                                                        )
+                                                    }
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Enter") {
+                                                            saveNewSectionName(
+                                                                sectionIndex
+                                                            );
+                                                        }
+                                                    }}
+                                                    className="border border-gray-300 px-2 py-1 rounded-md focus:ring-2 focus:ring-green-400 focus:outline-none"
+                                                    autoFocus
+                                                />
+                                            ) : (
+                                                <h3
+                                                    className="text-xl font-semibold text-green-600 cursor-pointer"
+                                                    onClick={() =>
+                                                        startEditing(
+                                                            sectionIndex,
+                                                            section.name
+                                                        )
+                                                    }
+                                                >
+                                                    {section.name}
+                                                </h3>
+                                            )}
+                                        </div>
+                                        {/* Upload & Delete Buttons */}
+                                        <div className="flex items-center gap-4">
+                                            <input
+                                                type="file"
+                                                multiple
+                                                className="hidden"
+                                                id={`file-upload-${sectionIndex}`}
+                                                onChange={(e) =>
+                                                    handleFileUpload(
+                                                        e,
+                                                        sectionIndex
+                                                    )
+                                                }
+                                            />
+                                            <label
+                                                htmlFor={`file-upload-${sectionIndex}`}
+                                                className="cursor-pointer bg-blue-500 text-white px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 transition text-sm"
+                                            >
+                                                <Upload size={18} /> Upload
+                                            </label>
+
+                                            <button
+                                                className={`px-3 py-2 rounded-lg flex items-center gap-2 transition text-sm ${
+                                                    section.files.length === 0
+                                                        ? "bg-red-500 text-white hover:bg-red-600"
+                                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                }`}
+                                                onClick={() =>
+                                                    deleteSection(sectionIndex)
+                                                }
+                                                disabled={
+                                                    section.files.length > 0
+                                                }
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* File List */}
+                                    <div className="mt-4 space-y-2">
+                                        {section.files.length > 0 ? (
+                                            section.files.map(
+                                                (file, fileIndex) => (
+                                                    <div
+                                                        key={fileIndex}
+                                                        className="flex justify-between items-center bg-gray-100 p-3 rounded-lg"
+                                                    >
+                                                        <span className="flex items-center gap-2">
+                                                            <FileText
+                                                                size={18}
+                                                                className="text-blue-500"
+                                                            />
+                                                            {file.name}
+                                                        </span>
+                                                        <div className="flex gap-2">
+                                                            <a
+                                                                href={URL.createObjectURL(
+                                                                    file
+                                                                )}
+                                                                download={
+                                                                    file.name
+                                                                }
+                                                                className="text-green-500 hover:text-green-700"
+                                                            >
+                                                                <Download
+                                                                    size={18}
+                                                                />
+                                                            </a>
+                                                            <button
+                                                                className="text-red-500 hover:text-red-700"
+                                                                onClick={() =>
+                                                                    deleteFile(
+                                                                        sectionIndex,
+                                                                        fileIndex
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Trash2
+                                                                    size={18}
+                                                                />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            )
+                                        ) : (
+                                            <p className="text-gray-500 text-sm">
+                                                No files uploaded.
+                                            </p>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            ))
+                    ) : (
+                        <div className="text-center flex h-full w-full items-center justify-center">
+                            <p className="text-gray-600 text-lg mb-4">
+                                No sections found.
+                            </p>
+                        </div>
+                    )}
+                    {/* Add Section Button at Bottom */}
+                    {sections.length > 0 && (
+                        <div className="flex items-center my-6">
+                            <hr className="flex-grow border-gray-300" />
+                            <button
+                                onClick={addSection}
+                                className="flex items-center gap-2 text-green-600 hover:text-green-800 transition text-lg font-semibold px-4"
+                            >
+                                <PlusCircle size={24} /> Add Section
+                            </button>
+                            <hr className="flex-grow border-gray-300" />
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
