@@ -8,6 +8,20 @@
 
 ---
 
+## ✨ Preview
+
+<div style="display: flex; justify-content: space-between;">
+  <img src="./sample_documents/home_preview.png" alt="Home Preview" width="45%" />
+  <img src="./sample_documents/symptom_analyzer_preview.png" alt="Symptom Analyzer" width="45%" />
+</div>
+
+<div style="display: flex; justify-content: space-between;">
+  <img src="./sample_documents/health_vault_preview.png" alt="Health Vault" width="45%" />
+  <img src="./sample_documents/e_prescription_preview.png" alt="E-Prescriptions" width="45%" />
+</div>
+
+---
+
 ## ✨ Features
 
 ### 📊 Dashboard
@@ -53,20 +67,6 @@
 ## ✨ Demo Website
 
 We will host the demo website at [https://swiftcare-qwertyfusion.vercel.app](https://swiftcare-qwertyfusion.vercel.app) in future. Stay tuned!
-
----
-
-## ✨ Preview
-
-<div style="display: flex; justify-content: space-between;">
-  <img src="./sample_documents/home_preview.png" alt="Home Preview" width="45%" />
-  <img src="./sample_documents/symptom_analyzer_preview.png" alt="Symptom Analyzer" width="45%" />
-</div>
-
-<div style="display: flex; justify-content: space-between;">
-  <img src="./sample_documents/health_vault_preview.png" alt="Health Vault" width="45%" />
-  <img src="./sample_documents/e_prescription_preview.png" alt="E-Prescriptions" width="45%" />
-</div>
 
 ---
 
