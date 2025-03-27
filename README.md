@@ -10,6 +10,42 @@
 
 ## ✨ Features
 
+### 📊 Dashboard
+
+-   **Quick Access to Features**: Easily navigate to frequently used tools like the Symptom Analyzer and E-Prescription. Each feature includes a brief description and usage instructions for a seamless experience.
+
+### 🤒 Symptom Analyzer
+
+-   **Symptom Input**: Users can input their symptoms through a structured questionnaire or free text entry.
+-   **AI-Powered Analysis**: Leverage AI technology to analyze symptoms and provide potential conditions or recommendations tailored to the user's input.
+-   **Suggested Actions**: Receive personalized suggestions for next steps, including recommendations to consult a doctor, self-care tips, or links to relevant articles.
+-   **Personalized Chatbot**: An AI chatbot offers tailored responses based on the user's medical history and records, enhancing the user experience.
+
+### 🧪 Smart Test Guide
+
+-   **Test Information**: Access comprehensive details about various medical tests, including preparation steps, procedures, and what to expect during the test.
+
+### 🏥 Health Vault
+
+-   **Personal Health Records**: Securely store and manage health records, including lab results, medical history, and vaccination records.
+-   **Document Upload**: Easily upload documents and images related to health records for convenient access.
+-   **Sharing Options**: Share health records securely with healthcare providers, ensuring privacy and compliance.
+-   **📝 Text Boxes**: Users can write and save notes for future reference, enhancing personal health management.
+-   **📂 Categorization Sections**: Organize health records and notes into multiple sections for better categorization and retrieval.
+
+### 💊 E-Prescription
+
+-   **Prescription Upload**: Users can upload prescriptions in image format for easy management.
+-   **OCR and AI Processing**: Utilize Optical Character Recognition (OCR) to extract text from uploaded prescriptions, with AI analyzing and storing the content for future reference.
+-   **✏️ Content Editing**: Users can edit any inaccuracies identified by the AI or OCR process before saving the information.
+-   **📜 Prescription History**: View a comprehensive history of past prescriptions, including extracted text and notes from AI analysis for better tracking.
+
+### 👤 Profile
+
+-   **User Information**: View and edit user profile details, including name, contact information, and password.
+-   **🔒 Security Settings**: Options to change passwords and enhance account security.
+-   **🕒 Activity Log**: Monitor the user's last login for added security and authenticity.
+
 ✅ **... and plenty more!**
 
 ---
@@ -184,8 +220,8 @@ Now, open [http://localhost:5173](http://localhost:5173) in your browser to see 
 <!-- Developer Info -->
 <h2>💻 Developer</h2>
 <ul>
-  <li><a href="https://github.com/QwertyFusion">[@QwertyFusion]</a></li>
-  <li><a href="https://github.com/SHREEYA-DAS">[@SHREEYA-DAS]</a></li>
-  <li><a href="https://github.com/Apratim23">[@Apratim23]</a></li>
-  <li><a href="https://github.com/Anurag0804">[@Anurag0804]</a></li>
+  <li><a href="https://github.com/QwertyFusion">[@QwertyFusion]</a> - Team Lead, Code Quality Assurance, backend, Dashboard, Symptom Analyzer, Smart Test Guide, Health-Vault, AI Agent, OCR + AI Analysis, and database implementation.</li>
+  <li><a href="https://github.com/SHREEYA-DAS">[@SHREEYA-DAS]</a> - User Authentication debugging & integration, and E-Prescription Page.</li>
+  <li><a href="https://github.com/Apratim23">[@Apratim23]</a> - User Authentication back-end, mailtrap implementation and user model implementation in database.</li>
+  <li><a href="https://github.com/Anurag0804">[@Anurag0804]</a> - User Authentication front-end and mailtrap implementation.</li>
 </ul>
