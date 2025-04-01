@@ -4,7 +4,7 @@
 
 <p align="center"><strong>Your AI-powered healthcare assistant for quick and reliable medical advice!</strong></p>
 
-**SwiftCare.ai** lets you have all your medical records and details saved at a secure portal, which you can refer to in case of any emergency. Also, a personalized AI chatbot will help you clear your doubts and will answer you your needs depending on your medical history.
+This platform lets you have all your medical records and details saved at a secure portal, which you can refer to in case of any emergency. Also, a personalized AI chatbot will help you clear your doubts and will answer you your needs depending on your medical history.
 
 ---
 
@@ -61,13 +61,6 @@
 -   **🕒 Activity Log**: Monitor the user's last login for added security and authenticity.
 
 ✅ **... and plenty more!**
-
----
-
-## ✨ Demo Website
-
-We will host the demo website at [https://swiftcare-qwertyfusion.vercel.app](https://swiftcare-qwertyfusion.vercel.app) in future. Stay tuned!
-
 ---
 
 ## 📜 License
@@ -82,8 +75,8 @@ See the [LICENSE](./LICENSE) file for more details.
 ### 1️⃣ Clone the Repository
 
 ```bash
-https://github.com/QwertyFusion/SwiftCare.ai.git
-cd SwiftCare.ai
+https://github.com/legenddev-star/AI-Medical-Platform.git
+cd AI-Medical-Platform
 ```
 
 ### 2️⃣ Set Up Environment Variables in the `root` folder
