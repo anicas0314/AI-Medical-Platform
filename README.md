@@ -63,13 +63,6 @@ This platform lets you have all your medical records and details saved at a secu
 ✅ **... and plenty more!**
 ---
 
-## 📜 License
-
-SwiftCare.ai is open-source and released under the **MIT License**.  
-See the [LICENSE](./LICENSE) file for more details.
-
----
-
 ## 🚀 Getting Started
 
 ### 1️⃣ Clone the Repository
