@@ -202,12 +202,3 @@ Now, open [http://localhost:5173](http://localhost:5173) in your browser to see 
   <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/github-white-icon.png" alt="GitHub" width="40" height="40"/>
 </a>
 </p>
-
-<!-- Developer Info -->
-<h2>💻 Developer</h2>
-<ul>
-  <li><a href="https://github.com/QwertyFusion">[@QwertyFusion]</a> - Team Lead, Code Quality Assurance, backend, Dashboard, Symptom Analyzer, Smart Test Guide, Health-Vault, AI Agent, OCR + AI Analysis, and database implementation.</li>
-  <li><a href="https://github.com/SHREEYA-DAS">[@SHREEYA-DAS]</a> - User Authentication debugging & integration, and E-Prescription Page.</li>
-  <li><a href="https://github.com/Apratim23">[@Apratim23]</a> - User Authentication back-end, mailtrap implementation and user model implementation in database.</li>
-  <li><a href="https://github.com/Anurag0804">[@Anurag0804]</a> - User Authentication front-end and mailtrap implementation.</li>
-</ul>
